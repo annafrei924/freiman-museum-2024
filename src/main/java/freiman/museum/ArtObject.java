@@ -5,6 +5,6 @@ public class ArtObject {
     public String longTitle;
     public String principalOrFirstMaker;
 
-    public webImage webImage;
+    public WebImage webImage;
 
 }

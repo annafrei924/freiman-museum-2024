@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MuseumTest {
+
     @Test
     void page() {
         //given
@@ -50,6 +51,7 @@ public class MuseumTest {
         assertNotNull(artObject.principalOrFirstMaker);
         assertNotNull(artObject.webImage);
     }
+
     @Test
     void artist() {
         //given

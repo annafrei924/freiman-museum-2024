@@ -1,6 +1,6 @@
 package freiman.museum;
 
-public class webImage {
+public class WebImage {
     public String guid;
     public int offsetPercentageX;
     public int offsetPercentageY;

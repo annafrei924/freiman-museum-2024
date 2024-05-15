@@ -19,7 +19,7 @@ public interface MuseumService {
     );
 
     @GET("/api/en/collection")
-    Single<ArtObjects> artist (
+    Single<ArtObjects> artist(
             @Query("key") String key,
             @Query("p") int pageNum,
             @Query("involvedMaker") String artist
