@@ -1,6 +1,6 @@
 package freiman.museum;
 
-public class artObjects {
+public class ArtObject {
     public String title;
     public String longTitle;
     public String principalOrFirstMaker;

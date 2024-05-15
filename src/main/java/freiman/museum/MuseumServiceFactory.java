@@ -10,8 +10,7 @@ public class MuseumServiceFactory {
 
     public MuseumService getService() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.rijksmuseum.nl/en/")
-               // .baseUrl("https://data.rijksmuseum.nl/") // URL HERE
+                .baseUrl("https://www.rijksmuseum.nl/api/en/collection/")
                 // Configure Retrofit to use Gson to turn the Json into Objects
                 .addConverterFactory(GsonConverterFactory.create())
                 // Configure Retrofit to use Rx
