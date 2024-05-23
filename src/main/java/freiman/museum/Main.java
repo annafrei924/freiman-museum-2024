@@ -6,5 +6,4 @@ public class Main {
         MuseumFrame frame = new MuseumFrame();
         frame.setVisible(true);
     }
-
 }

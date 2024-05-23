@@ -7,26 +7,19 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 
 public class MuseumFrame extends JFrame {
 
-    private MuseumService service = new MuseumServiceFactory().getService();
-    private ArtObjects collection;
-
-    private ApiKey apiKey = new ApiKey();
+    private final MuseumService service = new MuseumServiceFactory().getService();
+    private final ApiKey apiKey = new ApiKey();
     private int pageNum;
-    private JTextField searchField;
+    private final JTextField searchField;
     private JPanel imagesPanel;
 
-    //private JFrame imageFrame;
-    //private JPanel imageFrameMain;
 
     public MuseumFrame() {
         setSize(1300, 800);
@@ -37,29 +30,23 @@ public class MuseumFrame extends JFrame {
         main.setLayout(new BorderLayout());
         setContentPane(main);
 
-        // Create panel with buttons and search bar
+        // Create panel with buttons and search bar, and add listeners
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
         JButton prevPageButton = new JButton("Previous Page");
         JButton nextPageButton = new JButton("Next Page");
+
         pageNum = 0;
 
-        prevPageButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (pageNum > 0) {
-                    pageNum--;
-                    LoadImages();
-                }
+        prevPageButton.addActionListener(e -> {
+            if (pageNum > 0) {
+                pageNum--;
+                LoadImages();
             }
         });
 
-        nextPageButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pageNum++;
-                LoadImages();
-            }
+        nextPageButton.addActionListener(e -> {
+            pageNum++;
+            LoadImages();
         });
 
         searchField = new JTextField(40);
@@ -81,40 +68,27 @@ public class MuseumFrame extends JFrame {
             }
         });
 
-        // Add components to the top panel
+        // Add components to the top panel and then to main panel
         topPanel.add(prevPageButton);
         topPanel.add(searchField);
         topPanel.add(nextPageButton);
-
-        // Add the top panel to the main panel
         main.add(topPanel, BorderLayout.NORTH);
 
-        // Create the panel for displaying images with spacing
+        // create panel to display art with grid spacing
         imagesPanel = new JPanel();
         imagesPanel.setLayout(new GridLayout(2, 5, 10, 10)); // 2 rows, 5 columns, 10px horizontal and vertical gaps
         main.add(new JScrollPane(imagesPanel), BorderLayout.CENTER);
 
-        // Load the initial set of images
         LoadImages();
-/*
-        //set up displayImage
-        imageFrame = new JFrame();
-        imageFrame.setSize(800, 600);
-        imageFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        imageFrameMain = new JPanel();
-        imageFrameMain.setLayout(new BorderLayout());
-        setContentPane(imageFrameMain);
-
- */
 
     }
 
     private void LoadImages() {
-        // Clear previous images
         imagesPanel.removeAll();
 
+        ArtObjects collection;
 
-        // Get the list of artObjects
+        //get artObjects
         try {
             if (searchField.getText().isEmpty()) {
                 collection = service.page(apiKey.get(), pageNum).blockingGet();
@@ -133,24 +107,21 @@ public class MuseumFrame extends JFrame {
                         Image scaledImage = image.getScaledInstance(200, -1, Image.SCALE_DEFAULT);
                         ImageIcon imageIcon = new ImageIcon(scaledImage);
                         JLabel label = new JLabel(imageIcon);
-                        label.setToolTipText(artObject.title + " by " + artObject.principalOrFirstMaker);
+                        String title = artObject.title + " by " + artObject.principalOrFirstMaker;
+                        label.setToolTipText(title);
                         imagesPanel.add(label);
-/*
+
+                        //on click, open other frame
                         label.addMouseListener(new MouseAdapter()
                         {
                             @Override
-                            public void mouseClicked(MouseEvent e)
-                            {
-                                imageFrame.setTitle(artObject.title + " by " + artObject.principalOrFirstMaker);
-                                Image frameScaleImage = image.getScaledInstance(800, -1, Image.SCALE_DEFAULT);
-                                ImageIcon fImageIcon = new ImageIcon(frameScaleImage);
-                                JLabel lab = new JLabel(fImageIcon);
-                                imageFrameMain.add(lab);
-                                imageFrame.setVisible(true);
+                            public void mouseClicked(MouseEvent e) {
+                                ImageFrame imageFrame = new ImageFrame(title, image);
+                                imageFrame.show();
+
                             }
                         });
 
- */
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
