@@ -30,8 +30,7 @@ public class MuseumFrame extends JFrame {
         main.setLayout(new BorderLayout());
         setContentPane(main);
 
-        // Create panel with buttons and search bar, and add listeners
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // Create panel with buttons and search bar, and add listener
         JButton prevPageButton = new JButton("Previous Page");
         JButton nextPageButton = new JButton("Next Page");
 
@@ -40,13 +39,13 @@ public class MuseumFrame extends JFrame {
         prevPageButton.addActionListener(e -> {
             if (pageNum > 0) {
                 pageNum--;
-                LoadImages();
+                loadImages();
             }
         });
 
         nextPageButton.addActionListener(e -> {
             pageNum++;
-            LoadImages();
+            loadImages();
         });
 
         searchField = new JTextField(40);
@@ -54,21 +53,22 @@ public class MuseumFrame extends JFrame {
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                LoadImages();
+                loadImages();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                LoadImages();
+                loadImages();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                LoadImages();
+                loadImages();
             }
         });
 
         // Add components to the top panel and then to main panel
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(prevPageButton);
         topPanel.add(searchField);
         topPanel.add(nextPageButton);
@@ -79,11 +79,11 @@ public class MuseumFrame extends JFrame {
         imagesPanel.setLayout(new GridLayout(2, 5, 10, 10)); // 2 rows, 5 columns, 10px horizontal and vertical gaps
         main.add(new JScrollPane(imagesPanel), BorderLayout.CENTER);
 
-        LoadImages();
+        loadImages();
 
     }
 
-    private void LoadImages() {
+    private void loadImages() {
         imagesPanel.removeAll();
 
         ArtObjects collection;
