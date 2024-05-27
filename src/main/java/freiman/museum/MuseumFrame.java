@@ -108,7 +108,7 @@ public class MuseumFrame extends JFrame {
         imagesPanel.removeAll();
 
         // Display the images
-        for (int i = 0; i < collection.artObjects.length ; i++) {
+        for (int i = 0; i < collection.artObjects.length; i++) {
             ArtObject artObject = collection.artObjects[i];
             try {
                 URL url = new URL(artObject.webImage.url);
