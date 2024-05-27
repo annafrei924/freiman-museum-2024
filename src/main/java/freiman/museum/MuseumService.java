@@ -5,6 +5,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface MuseumService {
+
     @GET("/api/en/collection")
     Single<ArtObjects> page(
             @Query("key") String key,

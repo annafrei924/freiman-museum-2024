@@ -1,6 +1,9 @@
 package freiman.museum;
 
 import com.andrewoid.ApiKey;
+import hu.akarnokd.rxjava3.swing.SwingSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -39,13 +42,13 @@ public class MuseumFrame extends JFrame {
         prevPageButton.addActionListener(e -> {
             if (pageNum > 0) {
                 pageNum--;
-                loadImages();
+                getImagesPage();
             }
         });
 
         nextPageButton.addActionListener(e -> {
             pageNum++;
-            loadImages();
+            getImagesPage();
         });
 
         searchField = new JTextField(40);
@@ -53,17 +56,17 @@ public class MuseumFrame extends JFrame {
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                loadImages();
+                getImagesQuery();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                loadImages();
+                getImagesQuery();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                loadImages();
+                getImagesQuery();
             }
         });
 
@@ -79,58 +82,60 @@ public class MuseumFrame extends JFrame {
         imagesPanel.setLayout(new GridLayout(2, 5, 10, 10)); // 2 rows, 5 columns, 10px horizontal and vertical gaps
         main.add(new JScrollPane(imagesPanel), BorderLayout.CENTER);
 
-        loadImages();
-
+        getImagesPage();
     }
 
-    private void loadImages() {
+    private void getImagesPage() {
+        Disposable disposable = service.page(apiKey.get(), pageNum)
+                .subscribeOn(Schedulers.io())
+                .observeOn(SwingSchedulers.edt())
+                .subscribe(
+                        this::loadImages,
+                        Throwable::printStackTrace);
+    }
+
+    private void getImagesQuery() {
+        Disposable disposable = service.query(apiKey.get(), pageNum, searchField.getText())
+                .subscribeOn(Schedulers.io())
+                .observeOn(SwingSchedulers.edt())
+                .subscribe(
+                        this::loadImages,
+                        Throwable::printStackTrace);
+    }
+
+    private void loadImages(ArtObjects collection) {
+
         imagesPanel.removeAll();
 
-        ArtObjects collection;
+        // Display the images
+        for (int i = 0; i < collection.artObjects.length ; i++) {
+            ArtObject artObject = collection.artObjects[i];
+            try {
+                URL url = new URL(artObject.webImage.url);
+                Image image = ImageIO.read(url);
+                if (image != null) {
+                    Image scaledImage = image.getScaledInstance(200, -1, Image.SCALE_DEFAULT);
+                    ImageIcon imageIcon = new ImageIcon(scaledImage);
+                    JLabel label = new JLabel(imageIcon);
+                    String title = artObject.title + " by " + artObject.principalOrFirstMaker;
+                    label.setToolTipText(title);
+                    imagesPanel.add(label);
 
-        //get artObjects
-        try {
-            if (searchField.getText().isEmpty()) {
-                collection = service.page(apiKey.get(), pageNum).blockingGet();
-                System.out.println("Length:" + collection.artObjects.length);
-            } else {
-                collection = service.query(apiKey.get(), pageNum, searchField.getText()).blockingGet();
-            }
+                    //on click, open other frame
+                    label.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            ImageFrame imageFrame = new ImageFrame(title, image);
+                            imageFrame.show();
 
-            // Display the images
-            for (int i = 0; i < collection.artObjects.length && i < 10; i++) {
-                ArtObject artObject = collection.artObjects[i];
-                try {
-                    URL url = new URL(artObject.webImage.url);
-                    Image image = ImageIO.read(url);
-                    if (image != null) {
-                        Image scaledImage = image.getScaledInstance(200, -1, Image.SCALE_DEFAULT);
-                        ImageIcon imageIcon = new ImageIcon(scaledImage);
-                        JLabel label = new JLabel(imageIcon);
-                        String title = artObject.title + " by " + artObject.principalOrFirstMaker;
-                        label.setToolTipText(title);
-                        imagesPanel.add(label);
+                        }
+                    });
 
-                        //on click, open other frame
-                        label.addMouseListener(new MouseAdapter()
-                        {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                ImageFrame imageFrame = new ImageFrame(title, image);
-                                imageFrame.show();
-
-                            }
-                        });
-
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
         // Refresh the display
         imagesPanel.revalidate();
         imagesPanel.repaint();
