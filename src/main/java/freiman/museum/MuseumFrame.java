@@ -42,13 +42,13 @@ public class MuseumFrame extends JFrame {
         prevPageButton.addActionListener(e -> {
             if (pageNum > 0) {
                 pageNum--;
-                getImagesPage();
+                imagesPage();
             }
         });
 
         nextPageButton.addActionListener(e -> {
             pageNum++;
-            getImagesPage();
+            imagesPage();
         });
 
         searchField = new JTextField(40);
@@ -56,17 +56,17 @@ public class MuseumFrame extends JFrame {
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                getImagesQuery();
+                imagesQuery();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                getImagesQuery();
+                imagesQuery();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                getImagesQuery();
+                imagesQuery();
             }
         });
 
@@ -82,10 +82,10 @@ public class MuseumFrame extends JFrame {
         imagesPanel.setLayout(new GridLayout(2, 5, 10, 10)); // 2 rows, 5 columns, 10px horizontal and vertical gaps
         main.add(new JScrollPane(imagesPanel), BorderLayout.CENTER);
 
-        getImagesPage();
+        imagesPage();
     }
 
-    private void getImagesPage() {
+    private void imagesPage() {
         Disposable disposable = service.page(apiKey.get(), pageNum)
                 .subscribeOn(Schedulers.io())
                 .observeOn(SwingSchedulers.edt())
@@ -94,7 +94,7 @@ public class MuseumFrame extends JFrame {
                         Throwable::printStackTrace);
     }
 
-    private void getImagesQuery() {
+    private void imagesQuery() {
         Disposable disposable = service.query(apiKey.get(), pageNum, searchField.getText())
                 .subscribeOn(Schedulers.io())
                 .observeOn(SwingSchedulers.edt())
