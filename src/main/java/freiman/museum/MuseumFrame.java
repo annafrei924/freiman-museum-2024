@@ -10,6 +10,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -53,19 +55,10 @@ public class MuseumFrame extends JFrame {
 
         searchField = new JTextField(40);
 
-        searchField.getDocument().addDocumentListener(new DocumentListener() {
+        searchField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterPressed");
+        searchField.getActionMap().put("enterPressed", new AbstractAction() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                imagesQuery();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                imagesQuery();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 imagesQuery();
             }
         });
